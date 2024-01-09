@@ -8,6 +8,9 @@ import User from "../models/user.model";
 import Thread from "../models/thread.model";
 import Community from "../models/community.model";
 
+
+
+
 export async function fetchPosts(pageNumber = 1, pageSize = 20) {
   connectToDB();
 
@@ -41,7 +44,10 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
     parentId: { $in: [null, undefined] },
   }); // Get the total count of posts
 
+
   const posts = await postsQuery.exec();
+  
+
 
   const isNext = totalPostsCount > skipAmount + posts.length;
 
@@ -236,5 +242,106 @@ export async function addCommentToThread(
   } catch (err) {
     console.error("Error while adding comment:", err);
     throw new Error("Unable to add comment");
+  }
+}
+
+
+export async function addLikeToThreads(threadId: string, userId: string) {
+  await connectToDB(); // Assuming you have a function to connect to the database
+
+  try {
+    // Find the thread by its ID
+    const thread = await Thread.findById(threadId);
+    if (!thread) {
+      throw new Error('Thread not found');
+    }
+
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check if the user has already liked the thread
+    const isLiked = thread.likes.includes(user._id);
+    console.log(isLiked)
+
+    if (isLiked) {
+      throw new Error('Thread already liked by the user');
+    }
+
+    // Add user's ID to the likes array in the thread
+    await thread.likes.push(user._id);
+
+    // Save the updated thread
+    await thread.save();
+
+    // Add the liked thread's ID to the user's likedPosts array
+    await user.likedPosts.push(threadId);
+
+    // Save the updated user
+    await user.save();
+
+    console.log('Thread liked successfully');
+
+    // Return a success response to the frontend
+    return {
+      success: true,
+      message: 'Thread liked successfully',
+      likedThreadId: threadId,
+    };
+
+  } catch (error: any) {
+    console.error('Error liking thread:', error.message);
+    // Handle errors appropriately, e.g., send an error response
+  }
+}
+
+export async function unLikeToThreads(threadId: string, userId: string) {
+  await connectToDB(); // Assuming you have a function to connect to the database
+
+  try {
+    // Find the thread by its ID
+    const thread = await Thread.findById(threadId);
+    if (!thread) {
+      throw new Error('Thread not found');
+    }
+
+    const user = await User.findOne({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check if the user has already liked the thread
+    const isLiked = thread.likes.includes(user._id);
+    console.log(isLiked)
+
+    if (!isLiked) {
+      throw new Error('Thread already unliked by the user');
+    }
+
+    // Add user's ID to the likes array in the thread
+    await thread.likes.remove(user._id);
+
+    // Save the updated thread
+    await thread.save();
+
+    // Add the liked thread's ID to the user's likedPosts array
+    await user.likedPosts.remove(threadId);
+
+    // Save the updated user
+    await user.save();
+
+    console.log('Thread Unliked successfully');
+
+    // Return a success response to the frontend
+    return {
+      success: true,
+      message: 'Thread unliked successfully',
+      unlikedThreadId: threadId,
+    };
+
+  } catch (error: any) {
+    console.error('Error unliking thread:', error.message);
+    // Handle errors appropriately, e.g., send an error response
   }
 }
