@@ -42,7 +42,7 @@ const Liking = ({ threadId, currentUserId, liked }: props) => {
         alt="heart"
         width={24}
         height={24}
-        className="cursor-pointer object-contain"
+        className=" cursor-pointer object-contain"
         onClick={() => addLikeToPost(threadId, currentUserId)}
       />
     </div>

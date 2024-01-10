@@ -87,7 +87,8 @@ async function ThreadCard({
                   liked={liked}
                 />
                 {Number(totalLike) > 0 && (
-                  <span className="text-white ">{totalLike}</span>
+                  // eslint-disable-next-line tailwindcss/no-custom-classname
+                  <span className="-ml-3  text-gray-500 ">{totalLike}</span>
                 )}
 
                 <Link href={`/thread/${id}`}>
