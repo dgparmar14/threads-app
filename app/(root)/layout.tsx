@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -9,7 +8,6 @@ import LeftSidebar from "@/components/shared/LeftSidebar";
 import Bottombar from "@/components/shared/Bottombar";
 import RightSidebar from "@/components/shared/RightSidebar";
 import Topbar from "@/components/shared/Topbar";
-import { ReduxProvider } from "../redux/ReduxProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,26 +24,20 @@ export default function RootLayout({
     >
       <html lang="en">
         <body className={inter.className}>
-          <ReduxProvider>
-            <Topbar />
+          <Topbar />
 
-            <main className="flex flex-row">
-              <LeftSidebar />
+          <main className="flex flex-row">
+            <LeftSidebar />
 
-              <section className="main-container">
-                <div className="w-full max-w-4xl">
-                  {/* <ReduxProvider> */}
-                  {children}
-                  {/* </ReduxProvider> */}
-                </div>
-              </section>
-              {/* @ts-ignore */}
+            <section className="main-container">
+              <div className="w-full max-w-4xl">{children}</div>
+            </section>
+            {/* @ts-ignore */}
 
-              <RightSidebar />
-            </main>
+            <RightSidebar />
+          </main>
 
-            <Bottombar />
-          </ReduxProvider>
+          <Bottombar />
         </body>
       </html>
     </ClerkProvider>
