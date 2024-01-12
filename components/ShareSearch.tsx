@@ -4,12 +4,11 @@ import { Input } from "./ui/input";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
 const ShareSearch = () => {
-  const searchParams = useSearchParams();
+  const searchParams: any = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
 
   function handleSearch(terms: string) {
-    // console.log("terms : ", terms);
     const params = new URLSearchParams(searchParams);
     if (terms) {
       params.set("query", terms);
