@@ -11,8 +11,9 @@ async function page({
 }: {
   params: { threadId: string };
   searchParams: {
-    searchParams?: {
-      query?: string;
+    query: string;
+    searchParams: {
+      query: string | undefined;
     };
   };
 }) {

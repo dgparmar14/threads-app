@@ -70,6 +70,7 @@ async function Page({ params }: { params: { id: string } }) {
                   username={member.username}
                   imgUrl={member.image}
                   personType='User'
+                  senderId=""
                 />
               ))}
             </section>

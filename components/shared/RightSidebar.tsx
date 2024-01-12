@@ -36,6 +36,7 @@ async function RightSidebar() {
                   username={community.username}
                   imgUrl={community.image}
                   personType="Community"
+                  senderId=""
                 />
               ))}
             </>
@@ -60,6 +61,7 @@ async function RightSidebar() {
                   username={person.username}
                   imgUrl={person.image}
                   personType="User"
+                  senderId=""
                 />
               ))}
             </>

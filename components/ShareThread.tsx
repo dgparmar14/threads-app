@@ -1,9 +1,8 @@
 "use client";
-// import { shareThread } from "@/app/redux/slices/Share-Slice";
-// import { AppDispatch } from "@/app/redux/store";
+
 import Image from "next/image";
 import Link from "next/link";
-// import { useDispatch } from "react-redux";
+
 
 interface Params {
   threadId: string;
