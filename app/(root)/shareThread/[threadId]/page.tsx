@@ -75,6 +75,7 @@ async function page({
                 username={person.username}
                 imgUrl={person.image}
                 personType="User"
+                shared
                 senderId=""
               />
             ))}
