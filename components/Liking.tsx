@@ -11,32 +11,34 @@ interface props {
   threadId: string;
   currentUserId: string;
   liked: boolean;
+  totallike: number;
 }
 
-const Liking = ({ threadId, currentUserId, liked }: props) => {
+const Liking = ({ threadId, currentUserId, liked, totallike }: props) => {
   const [like, setLike] = useState(liked);
-
-  //   if (user.likedPosts.length > 0) {
-  //     setLike(true);
-  //   }
+  const [totalLike, setTotalLike] = useState(totallike);
 
   const addLikeToPost = async (threadId: string, currentUserId: string) => {
-    if (liked) {
-      const responese = await unLikeToThreads(threadId, currentUserId);
+    let responese;
+
+    if (like) {
+      responese = await unLikeToThreads(threadId, currentUserId);
       if (responese) {
         setLike(false);
+        setTotalLike(responese.totalLike);
+      }
+    } else {
+      responese = await addLikeToThreads(threadId, currentUserId);
+      if (responese) {
+        setLike(true);
+        setTotalLike(responese.totalLike);
       }
     }
 
-    const responese = await addLikeToThreads(threadId, currentUserId);
-
-    if (responese) {
-      setLike(!liked);
-    }
+    return responese;
   };
   return (
-    <div>
-      
+    <div className="flex gap-2">
       <Image
         src={like ? "/assets/heart-filled.svg" : "/assets/heart-gray.svg"}
         alt="heart"
@@ -45,6 +47,10 @@ const Liking = ({ threadId, currentUserId, liked }: props) => {
         className=" cursor-pointer object-contain"
         onClick={() => addLikeToPost(threadId, currentUserId)}
       />
+      {Number(totalLike) > 0 && (
+        // eslint-disable-next-line tailwindcss/no-custom-classname
+        <span className="w-1 text-gray-500">{totalLike}</span>
+      )}
     </div>
   );
 };

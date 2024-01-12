@@ -46,7 +46,7 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
 
 
   const posts = await postsQuery.exec();
-  
+
 
 
   const isNext = totalPostsCount > skipAmount + posts.length;
@@ -288,6 +288,8 @@ export async function addLikeToThreads(threadId: string, userId: string) {
       success: true,
       message: 'Thread liked successfully',
       likedThreadId: threadId,
+      totalLike: thread.likes.length
+
     };
 
   } catch (error: any) {
@@ -316,7 +318,7 @@ export async function unLikeToThreads(threadId: string, userId: string) {
     console.log(isLiked)
 
     if (!isLiked) {
-      throw new Error('Thread already unliked by the user');
+      throw new Error('Thread not unliked by the user');
     }
 
     // Add user's ID to the likes array in the thread
@@ -324,12 +326,16 @@ export async function unLikeToThreads(threadId: string, userId: string) {
 
     // Save the updated thread
     await thread.save();
+    console.log("Saved Thread : ", thread);
 
     // Add the liked thread's ID to the user's likedPosts array
     await user.likedPosts.remove(threadId);
 
     // Save the updated user
     await user.save();
+
+    console.log("Saved user : ", user);
+
 
     console.log('Thread Unliked successfully');
 
@@ -338,6 +344,7 @@ export async function unLikeToThreads(threadId: string, userId: string) {
       success: true,
       message: 'Thread unliked successfully',
       unlikedThreadId: threadId,
+      totalLike: thread.likes.length
     };
 
   } catch (error: any) {

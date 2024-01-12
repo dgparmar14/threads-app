@@ -3,6 +3,7 @@ import Link from "next/link";
 import { formatDateString } from "@/lib/utils";
 import DeleteThread from "../forms/DeleteThread";
 import Liking from "../Liking";
+import ShareThread from "../ShareThread";
 
 interface Props {
   id: string;
@@ -85,11 +86,8 @@ async function ThreadCard({
                   threadId={JSON.parse(JSON.stringify(id))}
                   currentUserId={currentUserId}
                   liked={liked}
+                  totallike={Number(totalLike)}
                 />
-                {Number(totalLike) > 0 && (
-                  // eslint-disable-next-line tailwindcss/no-custom-classname
-                  <span className="-ml-3  text-gray-500 ">{totalLike}</span>
-                )}
 
                 <Link href={`/thread/${id}`}>
                   <Image
@@ -103,18 +101,12 @@ async function ThreadCard({
 
                 <Image
                   src="/assets/repost.svg"
-                  alt="heart"
+                  alt="repost"
                   width={24}
                   height={24}
                   className="cursor-pointer object-contain"
                 />
-                <Image
-                  src="/assets/share.svg"
-                  alt="heart"
-                  width={24}
-                  height={24}
-                  className="cursor-pointer object-contain"
-                />
+                <ShareThread threadId={JSON.parse(JSON.stringify(id))} />
               </div>
 
               {isComment && comments.length > 0 && (

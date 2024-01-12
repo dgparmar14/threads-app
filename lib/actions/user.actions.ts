@@ -1,13 +1,16 @@
 "use server";
 
-import { FilterQuery, SortOrder } from "mongoose";
+
 import { revalidatePath } from "next/cache";
+// import { currentUser } from "@clerk/nextjs";
 
 import Community from "../models/community.model";
 import Thread from "../models/thread.model";
 import User from "../models/user.model";
 
 import { connectToDB } from "../mongoose";
+import { FilterQuery, SortOrder } from "mongoose";
+
 
 export async function fetchUser(userId: string) {
   try {
@@ -154,7 +157,9 @@ export async function fetchUsers({
 }
 
 export async function getActivity(userId: string) {
+
   try {
+
     connectToDB();
 
     // Find all threads created by the user
@@ -181,3 +186,134 @@ export async function getActivity(userId: string) {
     throw error;
   }
 }
+
+
+export async function sendNotification(id: string, threadId: string, senderId: string) {
+  try {
+    connectToDB();
+
+    const user = await fetchUser(id);
+    const sender = await fetchUser(senderId);
+
+    if (!user) {
+      console.log(`User with ID ${user._id} not found.`);
+      return;
+    }
+
+    // console.log("user notification array", user.notifications);
+    // console.log(typeof (user.notifications));
+
+    // check if the thread is already shared
+    // eslint-disable-next-line eqeqeq
+    const isAlreadyShared = user.notifications.some((notification: { threadId: string; }) => notification.threadId == threadId);
+
+    if (isAlreadyShared) {
+      console.log("Thread is already shared");
+      return;
+    }
+
+    const payload = {
+      type: "message",
+      createdAt: Date.now(),
+      senderId: sender._id,
+      threadId: threadId
+    };
+
+    // Push the thread ID into the user's notification array
+    user.notifications.push(payload);
+
+    // Save the updated user in the database
+    // eslint-disable-next-line no-unused-vars
+    const updatedUser = await User.findByIdAndUpdate(user._id, { notifications: user.notifications }, { new: true });
+
+    console.log(`Notification sent to user ${user.name}.`);
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    throw error;
+  }
+}
+
+export async function getNotification(userId: string) {
+  try {
+    // Get user's notification array
+    const user = await fetchUser(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const notificationArray = user.notifications;
+
+    // Validate array (optional)
+    if (!Array.isArray(notificationArray)) {
+      throw new Error("Invalid notification array");
+    }
+
+    // Sort the notifications array based on createdAt in descending order
+    notificationArray.sort((a, b) => b.createdAt - a.createdAt);
+
+    // Filter out only the notifications of type 'message'
+    const filteredNotifications = notificationArray.filter(notification => notification.type === 'message');
+
+    console.log("Filtered notification :", filteredNotifications)
+    const noti = filteredNotifications.map((notifi) => {
+      return notifi.senderId
+    })
+    console.log("NOTI : ", noti)
+    // Fetch details for each sender
+    const notificationsWithSenderDetails = await Promise.all(
+      filteredNotifications.slice(0, 10).map(async notification => {
+        const sender = await User.findById(notification.senderId);
+        // console.log("sender Name : ", sender.name)
+        return {
+          ...notification,
+          senderName: sender.name,
+          senderImage: sender.image,
+        };
+      })
+    );
+
+    // Return the newest 10 notifications with sender details to the front end
+    return notificationsWithSenderDetails;
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    throw error;
+  }
+}
+
+
+// try {
+//   // const result = await User.updateMany({}, { $unset: { notification: 1 } });
+//   const result = await User.updateMany([{
+//     $addFields: {
+//       notifications: [
+//         {
+//           type: {
+//             type: String, // You might have different types of notifications (e.g., 'message', 'like', 'comment', etc.)
+//             required: true,
+//           },
+//           createdAt: {
+//             type: Date,
+//             default: Date.now,
+//           },
+//           senderId: {
+//             type: mongoose.Schema.Types.ObjectId,
+//             required: true,
+//             ref: 'User', // Reference to the sender's user document
+//           },
+//           threadId: {
+//             type: mongoose.Schema.Types.ObjectId,
+//             required: true,
+//             ref: 'Thread',
+//           }, // Add this if you want to include a message in the notification
+//         },
+//       ],
+//     }
+//   }]);
+
+//   console.log(`${result.modifiedCount} documents updated successfully`);
+//   return result.modifiedCount; // Use modifiedCount instead of nModified
+// } catch (error) {
+//   console.error(error);
+//   throw error;
+// }
+
