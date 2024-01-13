@@ -44,6 +44,11 @@ async function RepliesTab({ currentUserId, accountId, accountType }: Props) {
 
   const userInfo = await fetchUser(currentUserId);
 
+  // replies tab logic
+  // first fetch user information and from user information fetch details of he commented on other's post
+  // now fetch that thread and your replied thrad
+  // now put map upoan it
+
   if (accountType === "Community") {
     result = await fetchCommunityPosts(accountId);
   } else {
@@ -53,9 +58,11 @@ async function RepliesTab({ currentUserId, accountId, accountType }: Props) {
   if (!result) {
     redirect("/");
   }
+  console.log("we are on replies tab");
 
   return (
     <section className="mt-9 flex flex-col gap-10">
+      <h1 className="head-text">RepliesTab</h1>
       {result.threads.map((thread) => (
         <ThreadCard
           key={thread._id}
