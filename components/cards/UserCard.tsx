@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { Button } from "../ui/button";
 import { sendNotification } from "@/lib/actions/user.actions";
+import { useState } from "react";
+import Send from "../ui/Send";
+
 // import { getNotification } from "@/lib/actions/user.actions";
 
 interface Props {
@@ -31,9 +34,17 @@ function UserCard({
   const router = useRouter();
   const pathname = usePathname();
   const threadId = pathname.split("/")[2];
-
-
+  const [btn, setBtn] = useState(true);
   // after clicking Done button back to home page
+
+  const notificationMoklvu = async (
+    id: string,
+    threadId: string,
+    senderId: string
+  ) => {
+    setBtn(false);
+    await sendNotification(id, threadId, senderId);
+  };
 
   const isCommunity = personType === "Community";
 
@@ -58,14 +69,10 @@ function UserCard({
         <Button
           className="user-card_btn"
           onClick={() => {
-            sendNotification(
-              id,
-              threadId,
-              senderId,
-            );
+            notificationMoklvu(id, threadId, senderId);
           }}
         >
-          Send
+          {btn ? "Send" : <Send />}
         </Button>
       ) : (
         <Button

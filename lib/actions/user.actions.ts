@@ -205,7 +205,9 @@ export async function sendNotification(id: string, threadId: string, senderId: s
 
     // check if the thread is already shared
     // eslint-disable-next-line eqeqeq
-    const isAlreadyShared = user.notifications.some((notification: { threadId: string; }) => notification.threadId == threadId);
+    const isAlreadyShared = user.notifications.some((notification: {
+      senderId: string; threadId: string;
+    }) => notification.threadId == threadId && notification.senderId == sender._id);
 
     if (isAlreadyShared) {
       console.log("Thread is already shared");
