@@ -59,6 +59,7 @@ const userSchema = new mongoose.Schema({
         ref: 'Thread',
       }, // Add this if you want to include a message in the notification
     },
+
   ],
 });
 
